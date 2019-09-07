@@ -1,2 +1,2 @@
 # Capstone-Project
-John Hopkind - Capstone Project
+John Hopkins - Capstone Project
