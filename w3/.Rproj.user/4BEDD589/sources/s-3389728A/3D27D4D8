@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1568439624839.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3D27D4D8",
+    "lastKnownWriteTime" : 1568441828,
+    "last_content_update" : 1568441828536,
+    "path" : "~/Documents/GIT/ datasciencecoursera/Capstone Project/Capstone-Project/Project Presentation.Rpres",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "48,43",
+        "scrollLine" : "41"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_presentation"
+}

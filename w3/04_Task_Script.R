@@ -82,24 +82,46 @@ tidy_repo <- clean_sample %>%
   anti_join(stop_words)
 
 #' Bigrams  
-#bigram_repo <- clean_sample  %>%
-#    unnest_tokens(bigram, text, token = "ngrams", n = 2)
-bigram_repo <- tokens(as.character(clean_sample), remove_number = TRUE, 
-       remove_punct = TRUE, ngrams = 2, skip = 1, concatenator = " ")
-as.data.frame(bigram_repo)
+bigram_repo <- clean_sample  %>%
+    unnest_tokens(bigram, text, token = "ngrams", n = 2)
+
+##bigram_repo <- clean_sample %>% 
+##  select(text) %>% 
+##  unnest_tokens(bigram, text) %>% 
+##  count(bigram, sort = TRUE)
+  
+#unnest_tokens(unigram, text) %>% 
+  #count(unigram, sort = TRUE)
+
+#bigram_repo <- tokens(as.character(clean_sample), remove_number = TRUE, 
+ #      remove_punct = TRUE, ngrams = 2, skip = 1, concatenator = " ")
+#as.data.frame(bigram_repo)
 #' Trigrams  
+##
 #trigram_repo <- clean_sample  %>%
 #  unnest_tokens(trigram, text, token = "ngrams", n = 3)
-trigram_repo <- tokens(as.character(clean_sample), remove_number = TRUE, 
-       remove_punct = TRUE, ngrams = 3, skip = 1, concatenator = " ")
-as.data.frame(trigram_repo)
+
+trigram_repo <- clean_sample %>% 
+  select(text) %>% 
+  unnest_tokens(trigram, text) %>% 
+  count(trigram, sort = TRUE)
+
+#trigram_repo <- tokens(as.character(clean_sample), remove_number = TRUE, 
+#       remove_punct = TRUE, ngrams = 3, skip = 1, concatenator = " ")
+#as.data.frame(trigram_repo)
 
 #' Quadgrams  
+
+quadgram_repo <- clean_sample %>% 
+  select(text) %>% 
+  unnest_tokens(quadgram, text) %>% 
+  count(quadgram, sort = TRUE)
+
 #quadgram_repo <- clean_sample  %>%
 #  unnest_tokens(quadgram, text, token = "ngrams", n = 4)
-quadgram_repo <- tokens(as.character(clean_sample), remove_number = TRUE, 
-       remove_punct = TRUE, ngrams = 4, skip = 1, concatenator = " ")
-as.data.frame(quadgram_repo)
+#quadgram_repo <- tokens(as.character(clean_sample), remove_number = TRUE, 
+#       remove_punct = TRUE, ngrams = 4, skip = 1, concatenator = " ")
+#as.data.frame(quadgram_repo)
 
 #' ## Reduce n-grams to top 50% of CDF  
 #' Unigram upper half

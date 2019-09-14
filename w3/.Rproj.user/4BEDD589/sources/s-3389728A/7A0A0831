@@ -5,13 +5,15 @@
     "dirty" : false,
     "encoding" : "UTF-8",
     "folds" : "",
-    "hash" : "4016753935",
+    "hash" : "0",
     "id" : "7A0A0831",
     "lastKnownWriteTime" : 1568438936,
     "last_content_update" : 1568438936229,
     "path" : "~/Documents/GIT/ datasciencecoursera/Capstone Project/Inspiration 3/JHU-Data-Science-Capstone/07_Task_SlideDeck.Rpres",
     "project_path" : null,
     "properties" : {
+        "cursorPosition" : "70,0",
+        "scrollLine" : "0"
     },
     "read_only" : false,
     "read_only_alternatives" : [
