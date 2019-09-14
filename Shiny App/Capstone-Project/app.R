@@ -36,7 +36,7 @@ ui <- fluidPage(
             h5("4. A question mark means no prediction, typically due to mis-spelling"),
             h5("5. Additional tabs show plots of the top ngrams in the dataset"),
             br(),
-            a("Source Code", href = "")
+            a("Source Code", href = "https://github.com/shkakbar/Capstone-Project/tree/master/Shiny%20App/Capstone-Project")
             
         ),
 

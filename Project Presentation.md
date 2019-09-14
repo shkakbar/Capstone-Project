@@ -1,4 +1,4 @@
-Coursera Data Science Specialization Capstone Project
+Coursera Data Science Specialization - Capstone Project
 ========================================================
 author: Akbarali Shaikh
 date: 14-Sep-2019
@@ -48,22 +48,21 @@ The next word prediction app provides a simple user interface to the next word p
 1. Fast response  
 2. Method allows for large training sets leading to better next word predictions
 
-[Shiny App Link]()  
+[Shiny App Link](https://akbaralishaikh.shinyapps.io/Capstone-Project/)  
 
 Documentation and Source Code
 ========================================================
-
 
 Report    
 "https://rpubs.com/sk_akbar/526007"
 
 Shiny App    
-""
+"https://akbaralishaikh.shinyapps.io/Capstone-Project/"
 
 Shiny App Source Code repository on Github    
-""
+"https://github.com/shkakbar/Capstone-Project/tree/master/Shiny%20App/Capstone-Project"
 
-Data Specialization Capstone repository on Github    
+Data Specialization Capstone Project repository on Github    
 "https://github.com/shkakbar/Capstone-Project"
 
 Tidy Data  
