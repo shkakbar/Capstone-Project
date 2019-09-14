@@ -53,14 +53,15 @@ The next word prediction app provides a simple user interface to the next word p
 Documentation and Source Code
 ========================================================
 
-Report    
-"https://rpubs.com/sk_akbar/526007"
 
 Shiny App    
 "https://akbaralishaikh.shinyapps.io/Capstone-Project/"
 
 Shiny App Source Code repository on Github    
 "https://github.com/shkakbar/Capstone-Project/tree/master/Shiny%20App/Capstone-Project"
+
+Report    
+"https://rpubs.com/sk_akbar/526007"
 
 Data Specialization Capstone Project repository on Github    
 "https://github.com/shkakbar/Capstone-Project"
