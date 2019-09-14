@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1567970159223.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "FD10C557",
+    "lastKnownWriteTime" : 1567968907,
+    "last_content_update" : 1567968907,
+    "path" : "~/Documents/GIT/ datasciencecoursera/Capstone Project/Capstone-Project/Capstone Project - Assignment 3.Rmd",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "7,27",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

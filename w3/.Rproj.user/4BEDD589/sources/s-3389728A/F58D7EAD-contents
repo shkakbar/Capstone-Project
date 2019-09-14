@@ -1,0 +1,102 @@
+#+ setup, echo=FALSE
+  library(tidytext)
+  library(tidyverse)
+  library(stringr)
+  library(knitr)
+  library(wordcloud)
+  library(ngram)
+
+
+#' English Repository Files
+blogs_file   <- "../data/en_US/en_US.blogs.txt"
+news_file    <- "../data/en_US/en_US.news.txt"
+twitter_file <- "../data/en_US/en_US.twitter.txt"  
+
+#' Read the data files
+blogs   <- readLines(blogs_file, skipNul = TRUE)
+news    <- readLines(news_file,  skipNul = TRUE)
+twitter <- readLines(twitter_file, skipNul = TRUE)
+
+set.seed(1001)
+sample_pct <- 0.05
+
+blogs_sample <- blogs %>%
+  sample_n(., nrow(blogs)*sample_pct)
+news_sample <- news %>%
+  sample_n(., nrow(news)*sample_pct)
+twitter_sample <- twitter %>%
+  sample_n(., nrow(twitter)*sample_pct)
+
+# combine text vectors together, create corpus ----
+single_vector <- c(blogs_sample, news_sample, twitter_sample)
+corpus <- VCorpus(VectorSource(single_vector))
+
+data("stop_words")
+swear_words <- read_delim("../data/en_US/en_US.swearWords.csv", delim = "\n", col_names = FALSE)
+swear_words <- unnest_tokens(swear_words, word, X1)
+
+# clean corpus function ----
+clean.corpus <- function(corpus) {
+  require(tm)
+  corpus <- tm_map(corpus, stripWhitespace)
+  corpus <- tm_map(corpus, content_transformer(tolower))
+  corpus <- tm_map(corpus, removePunctuation)
+  
+  corpus <- tm_map(corpus, removeNumbers)
+ # corpus <- tm_map(corpus, content_transformer(gsub),
+ #                   pattern = "shit|piss|fuck|cunt|cocksucker|motherfucker|tits",
+ #                  replacement = "")
+  corpus <- tm_map(corpus, content_transformer(gsub),
+                   pattern = swear_words,
+                   replacement = "")
+  
+  
+  corpus <- tm_map(corpus, PlainTextDocument)
+}
+
+# process corpus ----
+corpus <- clean.corpus(corpus)
+
+
+# create a data frame from the corpus ----
+text_df <- tidy(corpus)
+
+# tokenize and get unigrams ----
+text_unigrams <- text_df %>% 
+  select(text) %>% 
+  unnest_tokens(unigram, text) %>% 
+  count(unigram, sort = TRUE)
+
+# plot unigrams ----
+ggplot(text_unigrams[1:10,], aes(x = reorder(unigram,-n), y = n)) + geom_col(fill = "purple") + labs(x = "unigram", y = "frequency", title = "top 10 unigrams")
+
+##-----
+# tokenize by bigram ----
+text_bigrams <- text_df %>% 
+  select(text) %>% 
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>% 
+  count(bigram, sort = TRUE)
+
+# plot bigrams ----
+ggplot(text_bigrams[1:10, ], aes(x = reorder(bigram, -n), y = n)) + geom_col(fill = "blue") + labs(x = "bigram", y = "frequency", title = "top 10 bigrams")
+
+
+# tokenize by trigram ----
+text_trigrams <- text_df %>% 
+  select(text) %>% 
+  unnest_tokens(trigram, text, token = "ngrams", n = 3) %>% 
+  count(trigram, sort = TRUE)
+
+# plot trigram ----
+ggplot(text_trigrams[1:10, ], aes(x = reorder(trigram, -n), y = n)) + geom_col(fill = "orange") + labs(x = "trigram", y = "frequency", title = "top 10 trigrams")
+
+
+# tokenize by trigram ----
+text_quadgrams <- text_df %>% 
+  select(text) %>% 
+  unnest_tokens(quadgram, text, token = "ngrams", n = 4) %>% 
+  count(quadgram, sort = TRUE)
+
+# plot trigram ----
+ggplot(text_quadgrams[1:10, ], aes(x = reorder(quadgram, -n), y = n)) + geom_col(fill = "red") + labs(x = "trigram", y = "frequency", title = "top 10 quadgrams") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+

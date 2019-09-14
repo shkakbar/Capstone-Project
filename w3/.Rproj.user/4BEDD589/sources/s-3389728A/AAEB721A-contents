@@ -1,0 +1,237 @@
+---
+title: "Capstone - Milestone Report"
+author: "Akbarali Shaikh"
+date: "9/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Synopsis
+The captsone project focuses on utilizing data science techniques on the subject of natural language processing. The key task is to create an application using R Shiny to predict the next word given a preceding word or sequence of words. SwiftKey, the corporate sponsor for this project. 
+
+## Objective / Motivation
+1. Demonstrate that you've downloaded the data and have successfully loaded it in.
+2. Create a basic report of summary statistics about the data sets.
+3. Report any interesting findings that you amassed so far.
+4. Get feedback on your plans for creating a prediction algorithm and Shiny app.
+
+## Review criteria
+1. Does the link lead to an HTML page describing the exploratory analysis of the training data set?
+2. Has the data scientist done basic summaries of the three files? Word counts, line counts and basic data tables?
+3. Has the data scientist made basic plots, such as histograms to illustrate features of the data?
+4. Was the report written in a brief, concise style, in a way that a non-data scientist manager could appreciate?
+
+## Load Packages
+```{r}
+# Loading required libraries
+library(tm); 
+library(ngram); 
+library(wordcloud); 
+library(ggplot2)
+library(quanteda)
+```
+
+## Read and loading text file
+```{r}
+En_Twit_text <- readLines("./data/en_US/en_US.twitter.txt", encoding = "UTF-8", skipNul=TRUE)
+En_US_blogs_text <- readLines("./data/en_US/en_US.blogs.txt", encoding = "UTF-8", skipNul=TRUE)
+En_US_NEWS_text <- readLines("./data/en_US/en_US.news.txt", encoding = "UTF-8", skipNul=TRUE)
+```
+
+```{r}
+#Random Sampling from the three text files to be used for model building
+sample_pct <- 0.05
+
+twitter_sample = sample(En_Twit_text, length(En_Twit_text)*sample_pct, replace = FALSE)
+news_sample = sample(En_US_NEWS_text, length(En_US_NEWS_text)*sample_pct, replace = FALSE)
+blogs_sample = sample(En_US_blogs_text, length(En_US_blogs_text)*sample_pct, replace = FALSE)
+
+# Creating a corpus for text mining and pre-processing
+sample_files = c(twitter_sample,news_sample,blogs_sample)
+files = Corpus(VectorSource(sample_files))
+
+df.nwords.all <- data.frame(nword = c(twitter_sample, news_sample, blogs_sample), 
+  type = c(rep("blog", length(blogs_sample)), rep("twitter",length(twitter_sample)), 
+           rep("web", length(news_sample))))
+```
+
+## Exploratory data analysis
+
+```{r}
+make_Corpus<- function(test_file) {
+    gen_corp<- paste(test_file, collapse=" ")
+    gen_corp <- VectorSource(gen_corp)
+    gen_corp <- Corpus(gen_corp)
+}
+    
+clean_corp <- function(corp_data) {
+
+  WordSeparators  <- "[[:punct:]]|\u00ad|\u0091|\u0092|\u0093|\u0094|\u0095|\u0096|\u0097|\u0098|\u00a6"
+toSpace <- content_transformer(function(x, pattern) {return (gsub(pattern, ' ', x))})
+
+    corp_data <- tm_map(corp_data, toSpace, WordSeparators)
+    corp_data <- tm_map(corp_data, removeNumbers)
+    corp_data <- tm_map(corp_data, content_transformer(tolower))
+    corp_data <- tm_map(corp_data, removeWords, stopwords("english"))
+    corp_data <- tm_map(corp_data, removePunctuation)
+    corp_data <- tm_map(corp_data, stripWhitespace)
+    corp_data <- tm_map(corp_data, PlainTextDocument)
+    return (corp_data)
+}
+
+high_freq_words <- function (corp_data) {
+    term_sparse <- DocumentTermMatrix(corp_data)
+    term_matrix <- as.matrix(term_sparse)   ## convert our term-document-matrix into a normal matrix
+    freq_words <- colSums(term_matrix)
+    freq_words <- as.data.frame(sort(freq_words, decreasing=TRUE))
+    freq_words$word <- rownames(freq_words)
+    colnames(freq_words) <- c("Frequency","word")
+    return (freq_words)
+}
+```
+
+
+## Bar Chart of High frequency words
+```{r}
+## en_US.news.txt High frequency words 
+    
+    US_news_corpus <- make_Corpus(news_sample)
+    US_news_corpus <- clean_corp(US_news_corpus)
+    US_news_most_used_word <- high_freq_words(US_news_corpus)
+    US_news_most_used_word1<- US_news_most_used_word[1:15,]
+
+    p<-ggplot(data=US_news_most_used_word1, aes(x=reorder(word,Frequency), y=Frequency,
+                    fill=factor(reorder(word,-Frequency))))+ geom_bar(stat="identity") 
+    p + xlab("Word") +labs(title = "Most Frequent words : US News") +theme(legend.title=element_blank()) + coord_flip()
+
+
+## en_US.blogs.txt High frequency words 
+    US_blogs_corpus <- make_Corpus(blogs_sample)
+    US_blogs_corpus <- clean_corp(US_blogs_corpus)
+    US_blogs_most_used_word <- high_freq_words(US_blogs_corpus)
+    US_blogs_most_used_word1<- US_blogs_most_used_word[1:15,]
+
+    p<-ggplot(data=US_blogs_most_used_word1, aes(x=reorder(word,Frequency), y=Frequency,
+                    fill=factor(reorder(word,-Frequency))))+ geom_bar(stat="identity") 
+    p + xlab("Word") +labs(title = "Most Frequent words : US blogs") +theme(legend.title=element_blank()) + coord_flip()
+    
+    
+    ## en_US.twitter.txt High frequency words 
+    twitter_corpus <- make_Corpus(twitter_sample)
+    twitter_corpus <- clean_corp(twitter_corpus)
+    twitter_most_used_word <- high_freq_words(twitter_corpus)
+    twitter_most_used_word1<- twitter_most_used_word[1:15,]
+    
+    p<-ggplot(data=twitter_most_used_word1, aes(x=reorder(word,Frequency), y=Frequency,
+                    fill=factor(reorder(word,-Frequency))))+ geom_bar(stat="identity") 
+    p + xlab("Word") +labs(title = "Most Frequent words : Twitter") +theme(legend.title=element_blank()) + coord_flip()
+```
+
+## Generating the Word Cloud
+
+```{r}
+## US News Word Cloud
+    wordcloud(US_news_most_used_word$word[1:100], US_news_most_used_word$Frequency[1:100],
+              colors=brewer.pal(8, "Dark2"))
+
+## US Blogs Word Cloud
+    wordcloud(US_blogs_most_used_word$word[1:100], US_blogs_most_used_word$Frequency[1:100],
+              colors=brewer.pal(8, "Dark2"))    
+    
+## US Twitter Word Cloud
+    wordcloud(twitter_most_used_word$word[1:100], twitter_most_used_word$Frequency[1:100],
+              colors=brewer.pal(8, "Dark2"))
+```
+
+
+## Word Analysis
+For the Data analysis of text document we need to create a bag of word matrices with Unigram, Bigram, Trigrams. These Ngram model set improve the predictabily of the data analysis.
+
+```{r}
+## news High frequency words    
+    US_News_tokens<- tokens(news_sample,what ="word", remove_numbers = TRUE, 
+                            remove_punct = TRUE, remove_separators = TRUE, remove_symbols =TRUE )
+    US_News_tokens <- tokens_tolower(US_News_tokens)
+    US_News_tokens <- tokens_select(US_News_tokens, stopwords(),selection ="remove")
+
+    US_News_unigram <- tokens_ngrams(US_News_tokens, n=1)  ## unigram
+    US_News_unigram.dfm <- dfm(US_News_unigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)    
+
+    US_News_bigram <- tokens_ngrams(US_News_tokens, n=2)  ## bigram
+    US_News_bigram.dfm <- dfm(US_News_bigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)
+    
+    US_News_trigram <- tokens_ngrams(US_News_tokens, n=3)  ## trigram
+    US_News_trigram.dfm <- dfm(US_News_trigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)
+    topfeatures(US_News_unigram.dfm, 20)  # 20 top US News Unigram words
+    
+    
+    topfeatures(US_News_trigram.dfm, 20)  # 20 top US News Trigram words
+
+## blog High frequency words
+    US_blogs_tokens<- tokens(blogs_sample,what ="word", remove_numbers = TRUE, 
+                            remove_punct = TRUE, remove_separators = TRUE, remove_symbols =TRUE )
+    US_blogs_tokens <- tokens_tolower(US_blogs_tokens)
+    US_blogs_tokens <- tokens_select(US_blogs_tokens, stopwords(),selection ="remove")
+
+    US_blogs_unigram <- tokens_ngrams(US_blogs_tokens, n=1)  ## unigram
+    US_blogs_unigram.dfm <- dfm(US_blogs_unigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)    
+
+    US_blogs_bigram <- tokens_ngrams(US_blogs_tokens, n=2)  ## bigram
+    US_blogs_bigram.dfm <- dfm(US_blogs_bigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)
+    
+    US_blogs_trigram <- tokens_ngrams(US_blogs_tokens, n=3)  ## tiigram
+    US_blogs_trigram.dfm <- dfm(US_blogs_trigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)
+    topfeatures(US_blogs_unigram.dfm, 20)  # 20 top US blogs Unigram words
+    
+    
+    topfeatures(US_blogs_bigram.dfm, 20)  # 20 top US blogs Bigram words
+
+    topfeatures(US_blogs_trigram.dfm, 20)  # 20 top US blogs Trigram words
+
+
+## twitter Ngram words 
+    twitter_tokens<- tokens(twitter_sample,what ="word", remove_numbers = TRUE, 
+                            remove_punct = TRUE, remove_separators = TRUE, remove_symbols =TRUE )
+    twitter_tokens <- tokens_tolower(twitter_tokens)
+    twitter_tokens <- tokens_select(twitter_tokens, stopwords(),selection ="remove")
+
+    twitter_unigram <- tokens_ngrams(twitter_tokens, n=1)  ## unigram
+    twitter_unigram.dfm <- dfm(twitter_unigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)    
+
+    twitter_bigram <- tokens_ngrams(twitter_tokens, n=2)  ## bigram
+    twitter_bigram.dfm <- dfm(twitter_bigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)
+    
+    twitter_trigram <- tokens_ngrams(twitter_tokens, n=3)  ## trigram
+    twitter_trigram.dfm <- dfm(twitter_trigram, tolower =TRUE, remove = stopwords("english"), 
+                              remove_punct = TRUE)
+    topfeatures(twitter_unigram.dfm, 20)  # 20 top Unigram words
+
+    topfeatures(twitter_bigram.dfm, 20)  # 20 top Bigram words
+
+    topfeatures(twitter_trigram.dfm, 20)  # 20 top  Trigram words
+
+```
+
+## Interesting findings that you amassed so far
+I have gone through the multiple literatures and youtube vidios on Text mining. Learned almost everything new specifically “quanteda” library. How text data set will get exploded with different ngrams and Bag of words. 
+Looks like quanteda library is useful in generating the text analytics. Which very fast compare to TM library. 
+
+
+## Get feedback on your plans for creating a prediction algorithm and Shiny app.
+### Plan of Approach:
+- Tockenization and bag of words with multiple Ngrams. 
+- Due to limited resource (hardware and computational), analysis was done on a same sample to  build the shiny app.
+
+### Feedback:
+- Looking forward for the feedback and suggestion to improve the analysis.
